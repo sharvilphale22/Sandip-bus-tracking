@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
@@ -111,6 +111,10 @@ export default function LoginPage() {
 
         <div className="login-hint">
           Demo: <span>{hints[activeRole].email}</span> / <span>{hints[activeRole].pass}</span>
+        </div>
+
+        <div className="signup-footer">
+          Admin? <Link to="/signup" className="signup-link">Create an account</Link>
         </div>
       </div>
     </div>
