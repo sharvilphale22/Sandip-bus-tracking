@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Admin
@@ -36,6 +37,11 @@ function App() {
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to={`/${user.role}`} replace /> : <LoginPage />}
+      />
+
+      <Route
+        path="/signup"
+        element={isAuthenticated ? <Navigate to={`/${user.role}`} replace /> : <SignupPage />}
       />
 
       {/* Root redirect */}
