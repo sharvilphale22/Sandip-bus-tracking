@@ -60,7 +60,7 @@ const login = async (email, password) => {
       {children}
     </AuthContext.Provider>
   );
-}
+
 
 export function useAuth() {
   const context = useContext(AuthContext);
