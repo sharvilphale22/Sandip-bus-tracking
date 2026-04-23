@@ -1,73 +1,87 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { createContext, useContext, useState } from "react";
+import axios from "axios";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (token && storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        logout();
-      }
-    }
-    setLoading(false);
-  }, []);
-
-const login = async (email, password) => {
-  return axios.post('http://localhost:5000/login', { email, password });
-};
-    const { token: newToken, user: userData } = res.data;
-
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setToken(newToken);
-    setUser(userData);
-
-    return userData;
-  };
-
+  // ✅ REGISTER
   const register = async (name, email, password, phone) => {
-    const res = await api.post('/auth/register', { name, email, password, phone });
-    const { token: newToken, user: userData } = res.data;
+    try {
+      const res = await axios.post("/api/auth/register", {
+        name,
+        email,
+        password,
+        phone,
+      });
 
-    localStorage.setItem('token', newToken);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setToken(newToken);
-    setUser(userData);
+      console.log("REGISTER RESPONSE:", res.data);
 
-    return userData;
+      setUser(res.data.user);
+      setToken(res.data.token);
+
+      localStorage.setItem("token", res.data.token);
+
+      return res.data;
+
+    } catch (error) {
+      console.error("REGISTER ERROR:", error);
+      throw error;
+    }
   };
 
+  // ✅ LOGIN
+  const login = async (email, password) => {
+    try {
+      const res = await axios.post("/api/auth/login", {
+        email,
+        password,
+      });
+
+      setUser(res.data.user);
+      setToken(res.data.token);
+
+      localStorage.setItem("token", res.data.token);
+
+      return res.data;
+
+    } catch (error) {
+      console.error("LOGIN ERROR:", error);
+      throw error;
+    }
+  };
+
+  // ✅ LOGOUT
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
     setUser(null);
+    setToken(null);
+    localStorage.removeItem("token");
   };
 
+  // ✅ IMPORTANT: inside function only
   const isAuthenticated = !!token && !!user;
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, isAuthenticated }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        login,
+        register,
+        logout,
+        isAuthenticated,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
+};
 
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
-
-export default AuthContext;
+// ✅ Hook
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
