@@ -10,6 +10,7 @@ export default function SignupPage() {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -17,6 +18,7 @@ export default function SignupPage() {
     e.preventDefault();
     setError('');
 
+    // ✅ Validation
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -30,10 +32,36 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      const user = await register(name, email, password, phone);
-      navigate(`/${user.role}`, { replace: true });
+      // 🔍 Debug: what we are sending
+      console.log("Sending data:", { name, email, password, phone });
+
+      // API call
+      const response = await register(name, email, password, phone);
+
+      // 🔍 Debug: what backend returns
+      console.log("Backend response:", response);
+
+      // ❗ Check response structure
+      if (!response || !response.user) {
+        throw new Error("Invalid response from server");
+      }
+
+      // ✅ Success → redirect
+      navigate(`/${response.user.role}`, { replace: true });
+
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      // 🔍 Full error debug
+      console.error("Full error:", err);
+
+      const backendMessage = err.response?.data?.message;
+      const fallbackMessage = err.message;
+
+      setError(
+        backendMessage ||
+        fallbackMessage ||
+        'Registration failed. Please try again.'
+      );
+
     } finally {
       setLoading(false);
     }
@@ -51,9 +79,14 @@ export default function SignupPage() {
           <p>Create a new administrator account</p>
         </div>
 
-        {error && <div className="login-error" id="signup-error">{error}</div>}
+        {error && (
+          <div className="login-error" id="signup-error">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
+          {/* Name */}
           <div className="form-group">
             <label className="form-label">Full Name</label>
             <input
@@ -63,10 +96,10 @@ export default function SignupPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              id="signup-name"
             />
           </div>
 
+          {/* Email + Phone */}
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Email</label>
@@ -77,7 +110,6 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                id="signup-email"
               />
             </div>
 
@@ -89,11 +121,11 @@ export default function SignupPage() {
                 placeholder="+91 9876543210"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                id="signup-phone"
               />
             </div>
           </div>
 
+          {/* Passwords */}
           <div className="form-row">
             <div className="form-group">
               <label className="form-label">Password</label>
@@ -105,7 +137,6 @@ export default function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={4}
-                id="signup-password"
               />
             </div>
 
@@ -119,36 +150,35 @@ export default function SignupPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={4}
-                id="signup-confirm-password"
               />
             </div>
           </div>
 
+          {/* Role Info */}
           <div className="signup-role-info">
             <span className="signup-role-badge">🔐 Admin Role</span>
-            <p>This account will have full administrative access to the bus tracking system.</p>
+            <p>
+              This account will have full administrative access to the bus
+              tracking system.
+            </p>
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="btn btn-primary login-submit"
             disabled={loading}
-            id="signup-submit-btn"
           >
-            {loading ? (
-              <>
-                <span className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }}></span>
-                Creating Account...
-              </>
-            ) : (
-              'Create Admin Account'
-            )}
+            {loading ? 'Creating Account...' : 'Create Admin Account'}
           </button>
         </form>
 
+        {/* Footer */}
         <div className="signup-footer">
           Already have an account?{' '}
-          <Link to="/login" className="signup-link">Sign in here</Link>
+          <Link to="/login" className="signup-link">
+            Sign in here
+          </Link>
         </div>
       </div>
     </div>
