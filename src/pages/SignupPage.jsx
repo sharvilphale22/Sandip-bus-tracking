@@ -33,29 +33,24 @@ export default function SignupPage() {
 
     try {
       // 🔍 Debug: what we are sending
-      console.log("Sending data:", { name, email, password, phone });
+      console.log("🚀 Sending data:", { name, email, password, phone });
 
-      // API call
+      // ✅ SINGLE API CALL (FIXED)
       const response = await register(name, email, password, phone);
 
-      // 🔍 Debug: what backend returns
-      console.log("Backend response:", response);
+      // 🔍 Debug: backend response
+      console.log("✅ Backend response:", response);
 
-      // ❗ Check response structure
-      const response = await register(name, email, password, phone);
-
-console.log("Backend response:", response);
-
-if (!response.success) {
-  throw new Error(response.message);
-}
+      // ✅ Check response
+      if (!response || !response.success) {
+        throw new Error(response?.message || "Registration failed");
+      }
 
       // ✅ Success → redirect
       navigate(`/${response.user.role}`, { replace: true });
 
     } catch (err) {
-      // 🔍 Full error debug
-      console.error("Full error:", err);
+      console.error("🔴 Full error:", err);
 
       const backendMessage = err.response?.data?.message;
       const fallbackMessage = err.message;
@@ -84,12 +79,13 @@ if (!response.success) {
         </div>
 
         {error && (
-          <div className="login-error" id="signup-error">
+          <div className="login-error">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
+          
           {/* Name */}
           <div className="form-group">
             <label className="form-label">Full Name</label>
@@ -162,8 +158,7 @@ if (!response.success) {
           <div className="signup-role-info">
             <span className="signup-role-badge">🔐 Admin Role</span>
             <p>
-              This account will have full administrative access to the bus
-              tracking system.
+              This account will have full administrative access to the bus tracking system.
             </p>
           </div>
 
