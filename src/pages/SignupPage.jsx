@@ -42,9 +42,13 @@ export default function SignupPage() {
       console.log("Backend response:", response);
 
       // ❗ Check response structure
-      if (!response || !response.user) {
-        throw new Error("Invalid response from server");
-      }
+      const res = await api.post('/auth/register', formData);
+
+console.log("RESPONSE:", res.data);
+
+if (!res.data.success) {
+  throw new Error(res.data.message);
+}
 
       // ✅ Success → redirect
       navigate(`/${response.user.role}`, { replace: true });
