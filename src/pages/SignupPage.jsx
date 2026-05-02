@@ -42,12 +42,12 @@ export default function SignupPage() {
       console.log("Backend response:", response);
 
       // ❗ Check response structure
-      const res = await api.post('/auth/register', formData);
+      const response = await register(name, email, password, phone);
 
-console.log("RESPONSE:", res.data);
+console.log("Backend response:", response);
 
-if (!res.data.success) {
-  throw new Error(res.data.message);
+if (!response.success) {
+  throw new Error(response.message);
 }
 
       // ✅ Success → redirect
