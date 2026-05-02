@@ -11,50 +11,72 @@ const Register = () => {
 
   const [loading, setLoading] = useState(false);
 
+  // ==============================
+  // Handle input change
+  // ==============================
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
+  // ==============================
+  // Handle form submit
+  // ==============================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       setLoading(true);
-      console.log("Sending data:", formData);
+
+      console.log("🚀 Sending data:", formData);
 
       const res = await api.post("/auth/register", formData);
 
-      console.log("RESPONSE:", res.data);
+      console.log("✅ FULL RESPONSE:", res);
+      console.log("✅ DATA:", res.data);
 
-      if (!res.data.success) {
-        throw new Error(res.data.message);
+      // Safety check
+      if (!res || !res.data) {
+        throw new Error("No response from server");
       }
 
-      // Save token + user
+      if (!res.data.success) {
+        throw new Error(res.data.message || "Registration failed");
+      }
+
+      // ==============================
+      // Save data
+      // ==============================
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      alert("Registration Successful ✅");
+      alert("✅ Registration Successful");
 
-      // redirect (optional)
-      window.location.href = "/login";
+      // redirect safely
+      window.location.replace("/login");
 
     } catch (error) {
-      console.error("REGISTER ERROR:", error.response?.data || error.message);
+      console.error("🔴 REGISTER ERROR:", error);
 
-      alert(
+      const message =
         error.response?.data?.message ||
         error.message ||
-        "Registration failed"
-      );
+        "Something went wrong";
+
+      alert(`❌ ${message}`);
+
     } finally {
       setLoading(false);
     }
   };
 
+  // ==============================
+  // UI
+  // ==============================
   return (
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.form}>
@@ -103,19 +125,26 @@ const Register = () => {
   );
 };
 
-// Simple styling
+// ==============================
+// Styles
+// ==============================
 const styles = {
   container: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    height: "100vh"
+    height: "100vh",
+    background: "#f5f5f5"
   },
   form: {
     display: "flex",
     flexDirection: "column",
-    gap: "10px",
-    width: "300px"
+    gap: "12px",
+    width: "320px",
+    padding: "20px",
+    background: "#fff",
+    borderRadius: "8px",
+    boxShadow: "0 0 10px rgba(0,0,0,0.1)"
   }
 };
 
