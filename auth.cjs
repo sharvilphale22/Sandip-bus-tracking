@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config/keys');
+const { jwtSecret } = require('../config/keys.cjs');
 
 // Verify JWT token middleware
 const verifyToken = (req, res, next) => {
