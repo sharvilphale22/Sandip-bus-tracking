@@ -1,36 +1,121 @@
+const express = require('express');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config/keys.cjs');
 
-// Verify JWT token middleware
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Access denied. No token provided.' });
-  }
+const { jwtSecret, jwtExpiry } = require('../config/keys.cjs');
+const { students, drivers, admins } = require('../models/data.js');
 
-  const token = authHeader.split(' ')[1];
+const router = express.Router();
 
+// POST /api/auth/login
+router.post('/login', async (req, res) => {
   try {
-    const decoded = jwt.verify(token, jwtSecret);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Invalid or expired token.' });
+    const { loginId, password } = req.body;
+
+    if (!loginId || !password) {
+      return res.status(400).json({
+        message: 'Login ID and password are required.'
+      });
+    }
+
+    const cleanLoginId = String(loginId).trim();
+
+    let user = null;
+    let role = null;
+
+    // -------------------------
+    // Student login
+    // -------------------------
+    const student = students.find(
+      s => s.id === cleanLoginId || s.erpId === cleanLoginId
+    );
+
+    if (student) {
+      user = student;
+      role = 'student';
+    }
+
+    // -------------------------
+    // Driver login
+    // -------------------------
+    if (!user) {
+      const driver = drivers.find(
+        d => d.id === cleanLoginId || d.driverId === cleanLoginId
+      );
+
+      if (driver) {
+        user = driver;
+        role = 'driver';
+      }
+    }
+
+    // -------------------------
+    // Admin login
+    // -------------------------
+    if (!user) {
+      const admin = admins.find(
+        a => a.username === cleanLoginId
+      );
+
+      if (admin) {
+        user = admin;
+        role = 'admin';
+      }
+    }
+
+    // User not found
+    if (!user) {
+      return res.status(401).json({
+        message: 'Invalid login ID or password.'
+      });
+    }
+
+    // Check password
+    const passwordMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        message: 'Invalid login ID or password.'
+      });
+    }
+
+    // Create JWT
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: role,
+        name: user.name
+      },
+      jwtSecret,
+      {
+        expiresIn: jwtExpiry
+      }
+    );
+
+    // Never send password to frontend
+    const safeUser = { ...user };
+    delete safeUser.password;
+
+    // Send response
+    return res.json({
+      message: 'Login successful.',
+      token,
+      user: {
+        ...safeUser,
+        role
+      }
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+
+    return res.status(500).json({
+      message: 'Internal server error.'
+    });
   }
-};
+});
 
-// Role-checking middleware factory
-const requireRole = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({ message: 'Authentication required.' });
-    }
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'Insufficient permissions.' });
-    }
-    next();
-  };
-};
-
-module.exports = { verifyToken, requireRole };
+module.exports = router;
