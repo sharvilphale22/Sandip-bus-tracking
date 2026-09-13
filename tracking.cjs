@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../config/keys');
+const { jwtSecret } = require('../config/keys.cjs');
 const { buses, drivers, students, liveLocations, notifications, generateId } = require('../models/data');
 
 function setupSocketHandlers(io) {
