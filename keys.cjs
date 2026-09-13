@@ -28,11 +28,12 @@ module.exports = {
   jwtExpiry: '24h',
   port: process.env.PORT || 5001,
   allowedOrigins,
-  
+
   // Dummy API keys — replace with real values in production
   apiKeys: {
     websocketEndpoint: process.env.WS_ENDPOINT,
     openStreetMap: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    openStreetMapAttribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    openStreetMapAttribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }
 };
