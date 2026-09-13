@@ -2,29 +2,35 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
-const { port, allowedOrigins } = require('./config/keys');
+
+const { port, allowedOrigins } = require('./config/keys.cjs');
 
 // Routes
-const authRoutes = require('./routes/auth');
-const busRoutes = require('./routes/buses');
-const userRoutes = require('./routes/users');
-const notificationRoutes = require('./routes/notifications');
-const { setupSocketHandlers } = require('./socket/tracking');
+const authRoutes = require('./routes/auth.cjs');
+const busRoutes = require('./routes/buses.cjs');
+const userRoutes = require('./routes/users.cjs');
+const notificationRoutes = require('./routes/notifications.cjs');
+
+// Socket
+const { setupSocketHandlers } = require('./socket/tracking.cjs');
 
 const app = express();
 const server = http.createServer(app);
+
+// CORS configuration
 const corsOptions = {
   origin(origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
       return;
     }
+
     callback(new Error(`CORS blocked origin: ${origin}`));
   },
   credentials: true
 };
 
-// Socket.io
+// Socket.IO
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
@@ -33,7 +39,7 @@ const io = new Server(server, {
   }
 });
 
-// Make io accessible to routes
+// Make Socket.IO accessible to routes
 app.set('io', io);
 
 // Middleware
@@ -42,7 +48,9 @@ app.use(express.json());
 
 // Request logger
 app.use((req, res, next) => {
-  console.log(`${new Date().toLocaleTimeString()} │ ${req.method} ${req.path}`);
+  console.log(
+    `${new Date().toLocaleTimeString()} │ ${req.method} ${req.path}`
+  );
   next();
 });
 
@@ -52,23 +60,27 @@ app.use('/api/buses', busRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-// Health check
+// Health Check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Setup Socket.io handlers
+// Setup Socket.IO handlers
 setupSocketHandlers(io);
 
-// Start server
+// Start Server
 server.listen(port, () => {
   console.log('');
   console.log('  ╔══════════════════════════════════════════════╗');
   console.log('  ║      🚌  Sandip Bus Tracker — Server        ║');
-  console.log(`  ║      Running on port ${port}                   ║`);
-  console.log('  ║      WebSocket: Ready                       ║');
+  console.log(`  ║      Running on port ${port}                 ║`);
+  console.log('  ║      WebSocket: Ready                        ║');
   console.log('  ╚══════════════════════════════════════════════╝');
   console.log('');
+
   console.log('  Demo Logins:');
   console.log('  ─────────────────────────────────────────────');
   console.log('  Student:  STU001 / password123');
@@ -77,4 +89,8 @@ server.listen(port, () => {
   console.log('');
 });
 
-module.exports = { app, server, io };
+module.exports = {
+  app,
+  server,
+  io
+};
