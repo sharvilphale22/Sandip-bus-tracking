@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { jwtSecret } = require('../config/keys.cjs');
-const { buses, drivers, students, liveLocations, notifications, generateId } = require('../models/data');
+const { buses, drivers, students, liveLocations, notifications, generateId } = require('../models/data.cjs');
 
 function setupSocketHandlers(io) {
   io.use((socket, next) => {
