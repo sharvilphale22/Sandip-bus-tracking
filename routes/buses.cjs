@@ -1,6 +1,6 @@
 const express = require('express');
 const { verifyToken, requireRole } = require('../middleware/auth');
-const { buses, drivers, students, generateId } = require('../models/data');
+const { buses, drivers, students, generateId } = require('../models/data.cjs');
 
 const router = express.Router();
 
