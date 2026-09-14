@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const { jwtSecret, jwtExpiry } = require('../config/keys.cjs');
-const { students, drivers, admins } = require('../models/data.js');
+const { students, drivers, admins } = require('../models/data.cjs');
 
 const router = express.Router();
 
