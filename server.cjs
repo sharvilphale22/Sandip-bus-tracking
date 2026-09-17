@@ -37,7 +37,14 @@ const corsOptions = {
 // Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin(origin, callback) {
+      if (isAllowedOrigin(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`Socket.IO CORS blocked origin: ${origin}`));
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
   }
