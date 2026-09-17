@@ -347,16 +347,15 @@ export default function StudentDashboard() {
                 </button>
               </div>
               <MapView
-                height="min(380px, 45vh)"
-                busLocations={mapBusLocations}
-                stops={displayStops}
-                routePath={displayStops.map(s => [s.lat, s.lng])}
-                flyToPosition={mapFlyTo}
-                userStopName={myStopName}
-                unavailable={!bus}
-                unavailableMessage="No bus assigned"
-                autoFly={!!busLocation}
-              />
+  height="min(380px, 45vh)"
+  busLocations={mapBusLocations}
+  stops={displayStops}
+  flyToPosition={mapFlyTo}
+  userStopName={myStopName}
+  unavailable={!bus}
+  unavailableMessage="No bus assigned"
+  autoFly={!!busLocation}
+/>
               {!tripActive && bus && (
                 <p className="text-xs text-text-muted text-center mt-2">
                   Bus location will appear when the trip starts
