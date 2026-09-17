@@ -24,7 +24,7 @@ const server = http.createServer(app);
 // CORS configuration
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       callback(null, true);
       return;
     }
