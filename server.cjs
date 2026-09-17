@@ -3,7 +3,11 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 
-const { port, allowedOrigins } = require('./config/keys.cjs');
+const {
+  port,
+  allowedOrigins,
+  isAllowedOrigin
+} = require('./config/keys.cjs');
 
 // Routes
 const authRoutes = require('./routes/auth.cjs');
