@@ -80,7 +80,6 @@ export default function MapView({
   zoom = 13,
   busLocations = [],
   stops = [],
-  routePath = [],
   flyToPosition = null,
   height = '360px',
   className = '',
