@@ -7,13 +7,10 @@ if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET must be set in production');
 }
 
-// Allowed frontend origins
+// Explicitly allowed frontend origins
 const allowedOrigins = [
   // Production Vercel
   'https://sandip-bus-tracking.vercel.app',
-
-  // Current Vercel preview
-  'https://sandip-bus-tracking-5b1oj6jw-sharvil1.vercel.app',
 
   // Local development
   'http://localhost:5173',
@@ -30,6 +27,21 @@ const allowedOrigins = [
 
 const uniqueOrigins = [...new Set(allowedOrigins)];
 
+// Allow only Vercel previews belonging to this project.
+// Example:
+// https://sandip-bus-tracking-5as2ksobc-sharvil1.vercel.app
+const vercelPreviewOrigin =
+  /^https:\/\/sandip-bus-tracking-[a-z0-9-]+\.vercel\.app$/i;
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+
+  return (
+    uniqueOrigins.includes(origin) ||
+    vercelPreviewOrigin.test(origin)
+  );
+};
+
 module.exports = {
   jwtSecret,
 
@@ -38,6 +50,8 @@ module.exports = {
   port: process.env.PORT || 5001,
 
   allowedOrigins: uniqueOrigins,
+
+  isAllowedOrigin,
 
   apiKeys: {
     websocketEndpoint: process.env.WS_ENDPOINT,
