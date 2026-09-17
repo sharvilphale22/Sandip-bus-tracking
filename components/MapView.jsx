@@ -145,17 +145,6 @@ export default function MapView({
 
         <RecenterControl position={recenterTarget} zoom={zoom} />
 
-        {routePath.length > 0 && (
-          <Polyline
-            positions={routePath}
-            pathOptions={{
-              color: PRIMARY,
-              weight: 4,
-              opacity: 0.75,
-            }}
-          />
-        )}
-
         {stops.map((stop, i) => (
           <Marker
             key={`stop-${stop.name}-${i}`}
