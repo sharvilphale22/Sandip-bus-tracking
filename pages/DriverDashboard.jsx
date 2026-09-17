@@ -237,14 +237,22 @@ export default function DriverDashboard() {
             <MapView
               height="450px"
               busLocations={currentLocation ? [{
-                id: bus?.id, number: bus?.number,
-                lat: currentLocation.lat, lng: currentLocation.lng,
-                isActive: tripActive, speed: currentLocation.speed
+                id: bus?.id,
+                number: bus?.number,
+                lat: currentLocation.lat,
+                lng: currentLocation.lng,
+                isActive: tripActive,
+                speed: currentLocation.speed
               }] : []}
               stops={bus?.stops || []}
-              routePath={bus?.stops ? bus.stops.map(s => [s.lat, s.lng]) : []}
-              flyToPosition={currentLocation ? [currentLocation.lat, currentLocation.lng] : bus?.stops?.[0] ? [bus.stops[0].lat, bus.stops[0].lng] : null}
-            />
+              flyToPosition={
+                currentLocation
+                ? [currentLocation.lat, currentLocation.lng]
+                : bus?.stops?.[0]
+                ? [bus.stops[0].lat, bus.stops[0].lng]
+                : null
+              }
+              />
           </div>
 
           {/* Stops list */}
