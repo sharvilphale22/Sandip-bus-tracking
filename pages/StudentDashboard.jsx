@@ -376,7 +376,6 @@ export default function StudentDashboard() {
               height="min(420px, 55vh)"
               busLocations={mapBusLocations}
               stops={displayStops}
-              routePath={displayStops.map(s => [s.lat, s.lng])}
               flyToPosition={mapFlyTo}
               userStopName={myStopName}
               unavailable={!bus}
